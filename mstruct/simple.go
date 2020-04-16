@@ -14,35 +14,67 @@ func NewConvert(m map[string]interface{}) *SimpleConvert{
 	return &SimpleConvert{TargetMap:m}
 }
 
+//
+//func (s *SimpleConvert)Convert(dest interface{})(error){
+//	var t=reflect.TypeOf(dest)
+//	//判断是否是指针
+//	if t.Kind()!=reflect.Ptr{
+//		return errors.New("is not ptr")
+//
+//	}
+//	var e=t.Elem();
+//	if e.Kind()!=reflect.Struct{
+//		return errors.New("is not a struct")
+//	}
+//
+//	if(len(s.TargetMap)==0){
+//		return errors.New("nothing to set")
+//	}
+//	var va =reflect.New(e).Elem()
+//
+//	for key,value:=range s.TargetMap{
+//		if _,b:=e.FieldByName(key); !b{
+//			return fmt.Errorf("can not find %s from %s",key,e.Name())
+//		}
+//		ns:=va.FieldByName(key)
+//		//判断是否可以设置值
+//		if ca:=ns.CanSet();ca{
+//			ns.Set(reflect.ValueOf(value))
+//		}else{
+//			return fmt.Errorf("%s can't  set",key)
+//
+//		}
+//
+//	}
+//	reflect.ValueOf(dest).Elem().Set(va)
+//	return nil
+//}
 
 
-
-
-func (s *SimpleConvert)Convert(dest interface{})(err error){
-	var destType=reflect.TypeOf(dest)
+func (s *SimpleConvert)Convert(dest interface{})(error){
+	var t=reflect.TypeOf(dest)
 	//判断是否是指针
-	if destType.Kind()!=reflect.Ptr{
-		err=errors.New("is not ptr")
-		return
+	if t.Kind()!=reflect.Ptr{
+		return errors.New("is not ptr")
 	}
-	var e=destType.Elem();
+	var e=t.Elem();
 	if e.Kind()!=reflect.Struct{
-		err=errors.New("is not a struct")
+		return errors.New("is not a struct")
 	}
-	var va =reflect.New(e).Elem()
-	if(len(s.TargetMap)>0){
-		for key,value:=range s.TargetMap{
-			if _,b:=e.FieldByName(key); b{
-				nameStruct:=va.FieldByName(key)
-				if canSet:=nameStruct.CanSet();canSet{
-					nameStruct.Set(reflect.ValueOf(value))
-				}
-			}else{
-				err=fmt.Errorf("can not find %s from %s",key,e.Name())
-				return
-			}
+	if(len(s.TargetMap)==0){
+		return errors.New("nothing to set")
+	}
+	for key,value:=range s.TargetMap{
+		if _,b:=e.FieldByName(key); !b{
+			return fmt.Errorf("can not find %s from %s",key,e.Name())
+		}
+		ns:=reflect.ValueOf(dest).Elem().FieldByName(key)
+		//判断是否可以设置值
+		if ca:=ns.CanSet();ca && ns.Kind()==reflect.ValueOf(value).Kind(){
+			ns.Set(reflect.ValueOf(value))
+		}else{
+			return fmt.Errorf("%s can't  set",key)
 		}
 	}
-	reflect.ValueOf(dest).Elem().Set(va)
-	return
+	return nil
 }
