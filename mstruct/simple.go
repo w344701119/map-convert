@@ -1,7 +1,7 @@
 package mstruct
 
 import (
-	map_convert "convert"
+	"convert"
 	"fmt"
 	"reflect"
 	"time"

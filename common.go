@@ -1,14 +1,14 @@
 package map_convert
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
 	"strings"
 	"time"
 )
 
 var (
-	ErrorAssertion = fmt.Errorf("fail to assertion")
+	ErrorAssertion = errors.New("fail to assertion")
 	TimeLayout     = "2006-01-02 15:04:05"
 )
 
@@ -52,5 +52,5 @@ func TimeConvert(t interface{}) (time.Time, error) {
 			return time.Now(), ErrorAssertion
 		}
 	}
-	return time.Now(), fmt.Errorf("not supper type")
+	return time.Now(), errors.New("not supper type")
 }
